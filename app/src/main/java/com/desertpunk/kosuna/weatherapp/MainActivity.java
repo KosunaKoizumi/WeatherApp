@@ -78,32 +78,53 @@ public class MainActivity extends AppCompatActivity {
     public void renderWeatherData (String city){
 
         WeatherTask weatherTask = new WeatherTask();
-        weatherTask.execute(new String[]{city + "&units=metric"});
+//        weatherTask.execute(new String[]{city + "&units=metric"});
+        weatherTask.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, new String[]{city + "&units=metric"});
+
+
+
+
+
+
+
 
     }
 
     private class WeatherTask extends AsyncTask<String, Void, Weather>{
+
+        String icon=null;
         @Override
         protected Weather doInBackground(String... params) {
 
             String data = ((new WeatherHttpClient()).getWeatherData(params[0]));
 
-            weather.iconData = weather.currentCondition.getIcon();
+
+
+
+
 
             weather = JSONWeatherParser.getWeather(data);
 
             Log.v("Data: ", weather.place.getCity());
 
-//            new DowndoladImageAsyncTask().execute(weather.iconData);
+
+
+
 
 
             return weather;
+
 
         }
 
         @Override
         protected void onPostExecute(Weather weather) {
             super.onPostExecute(weather);
+            icon = weather.currentCondition.getIcon();
+
+
+            Log.v("log", icon);
+            new DowndoladImageAsyncTask().execute(icon);
 
             java.text.DateFormat df = java.text.DateFormat.getTimeInstance();
 
@@ -129,20 +150,21 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-//    private class DowndoladImageAsyncTask extends AsyncTask<String, Void, Bitmap>{
-//
-//        @Override
-//        protected Bitmap doInBackground(String... params) {
-//            return downloadImage(params[0]);
-//        }
-//
-//        @Override
-//        protected void onPostExecute(Bitmap bitmap) {
-//
-//            iconView.setImageBitmap(bitmap);
-//        }
-//
-//        private Bitmap downloadImage(String code) throws IOException {
+    private class DowndoladImageAsyncTask extends AsyncTask<String, Void, Bitmap>{
+
+        @Override
+        protected Bitmap doInBackground(String... params) {
+//            Log.d("log", params[0].toString());
+            return downloadImage(params[0]);
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap bitmap) {
+
+            iconView.setImageBitmap(bitmap);
+        }
+
+        private Bitmap downloadImage(String code)  {
 //            final DefaultHttpClient client = new DefaultHttpClient();
 //
 //            final HttpGet getRequest = new HttpGet(Utils.ICON_URL + code + ".png");
@@ -170,8 +192,30 @@ public class MainActivity extends AppCompatActivity {
 //
 //            } catch (IOException e){
 //                e.printStackTrace();
-//            }
-//            return null;
+            try {
+                URL url = new URL(Utils.ICON_URL + code + ".png");
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setDoInput(true);
+                connection.connect();
+                InputStream inputStream = connection.getInputStream();
+                Bitmap myBitmap = BitmapFactory.decodeStream(inputStream);
+//                inputStream.close();
+//                connection.disconnect();
+                return myBitmap;
+                }
+            catch (IOException e){
+                e.printStackTrace();
+                return null;
+
+            }
+
+
+
+
+
+            }
+
+
 
 
 
@@ -213,10 +257,10 @@ public class MainActivity extends AppCompatActivity {
 //        return true;
 //    }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item){
-        super.onOptionsItemSelected(item);
-        return true;
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item){
+//        super.onOptionsItemSelected(item);
+//        return true;
 
 //        int id = item.getItemId();
 //
