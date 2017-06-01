@@ -22,6 +22,6 @@ public class CityPreference {
     }
 
     public void setCity(String city){
-        prefs.edit().putString("city", city).commit();
+        prefs.edit().putString("city", city + "&appid=0254c107ac72d94ceb869f7857a97fa4").commit();
     }
 }

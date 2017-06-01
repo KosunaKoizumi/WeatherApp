@@ -4,10 +4,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.icu.text.DateFormat;
-import android.icu.text.DecimalFormat;
 import android.os.AsyncTask;
-import android.preference.DialogPreference;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.InputType;
@@ -17,21 +14,18 @@ import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Date;
-
 import Util.Utils;
 import data.CityPreference;
 import data.JSONWeatherParser;
 import data.WeatherHttpClient;
 import model.Weather;
 
-import static android.provider.ContactsContract.CommonDataKinds.Website.URL;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -47,10 +41,6 @@ public class MainActivity extends AppCompatActivity {
     private TextView updated;
 
     Weather weather = new Weather();
-
-    HttpURLConnection urlConnection = null;
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,8 +58,6 @@ public class MainActivity extends AppCompatActivity {
         sunset = (TextView) findViewById(R.id.setText);
         updated = (TextView) findViewById(R.id.updateText);
 
-
-
         CityPreference cityPreference = new CityPreference(MainActivity.this);
 
         renderWeatherData(cityPreference.getCity());
@@ -79,15 +67,7 @@ public class MainActivity extends AppCompatActivity {
 
         WeatherTask weatherTask = new WeatherTask();
 //        weatherTask.execute(new String[]{city + "&units=metric"});
-        weatherTask.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, new String[]{city + "&units=metric"});
-
-
-
-
-
-
-
-
+        weatherTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, new String[]{city + "&units=metric"});
     }
 
     private class WeatherTask extends AsyncTask<String, Void, Weather>{
@@ -95,33 +75,16 @@ public class MainActivity extends AppCompatActivity {
         String icon=null;
         @Override
         protected Weather doInBackground(String... params) {
-
             String data = ((new WeatherHttpClient()).getWeatherData(params[0]));
-
-
-
-
-
-
             weather = JSONWeatherParser.getWeather(data);
-
-            Log.v("Data: ", weather.place.getCity());
-
-
-
-
-
-
+//            Log.v("Data: ", weather.place.getCity());
             return weather;
-
-
         }
 
         @Override
         protected void onPostExecute(Weather weather) {
             super.onPostExecute(weather);
             icon = weather.currentCondition.getIcon();
-
 
             Log.v("log", icon);
             new DowndoladImageAsyncTask().execute(icon);
@@ -135,7 +98,6 @@ public class MainActivity extends AppCompatActivity {
             java.text.DecimalFormat decimalFormat = new java.text.DecimalFormat("#.#");
 
             String tempFormat = decimalFormat.format(weather.currentCondition.getTemperature());
-
 
             cityName.setText(weather.place.getCity() + ", " + weather.place.getCountry());
             temp.setText("" + tempFormat + "C");
@@ -173,8 +135,8 @@ public class MainActivity extends AppCompatActivity {
                 connection.connect();
                 InputStream inputStream = connection.getInputStream();
                 Bitmap myBitmap = BitmapFactory.decodeStream(inputStream);
-//                inputStream.close();
-//                connection.disconnect();
+                inputStream.close();
+                connection.disconnect();
                 return myBitmap;
                 }
             catch (IOException e){
@@ -183,16 +145,7 @@ public class MainActivity extends AppCompatActivity {
 
             }
             }
-
-
-
-
-
-
-
-
         }
-
 
     private void showInputDialog(){
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
@@ -210,12 +163,10 @@ public class MainActivity extends AppCompatActivity {
 
                 String newCity = cityPreference.getCity();
 
-                renderWeatherData(newCity + "&appid=0254c107ac72d94ceb869f7857a97fa4");
+                renderWeatherData(newCity);
             }
         });
         builder.show();
-
-
     }
 
     @Override
@@ -223,14 +174,8 @@ public class MainActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.menu, menu);
        return true;
     }
-
-
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item){
-
-
-
         int id = item.getItemId();
 
         if (id == R.id.change_cityId){
@@ -238,11 +183,5 @@ public class MainActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-
-
-
-
-
-
 
 }
