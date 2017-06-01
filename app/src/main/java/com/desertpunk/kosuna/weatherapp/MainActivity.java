@@ -165,33 +165,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         private Bitmap downloadImage(String code)  {
-//            final DefaultHttpClient client = new DefaultHttpClient();
-//
-//            final HttpGet getRequest = new HttpGet(Utils.ICON_URL + code + ".png");
-//
-//            try {
-//                HttpResponse response = client.execute(getRequest);
-//
-//                final int statusCode = response.getStatusLine().getStatusCode();
-//
-//                if ( statusCode != HttpStatus.SC_OK){
-//                    Log.e("DownloadImage", "Error:" + statusCode);
-//                    return null;
-//                }
-//                final HttpEntity entity = response.getEntitiy();
-//
-//                if (entity != null){
-//
-//                    InputStream inputStream = null;
-//
-//                    inputStream = entity.getContent;
-//                    //decode contents from stream
-//                    final Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-//                    return bitmap;
-//                }
-//
-//            } catch (IOException e){
-//                e.printStackTrace();
+
             try {
                 URL url = new URL(Utils.ICON_URL + code + ".png");
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -208,11 +182,6 @@ public class MainActivity extends AppCompatActivity {
                 return null;
 
             }
-
-
-
-
-
             }
 
 
@@ -222,52 +191,52 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-//        }
-//    }
-//
-//    private void showInputDialog(){
-//        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-//        builder.setTitle("Change City");
-//
-//        final EditText cityInput = new EditText(MainActivity.this);
-//        cityInput.setInputType(InputType.TYPE_CLASS_TEXT);
-//        cityInput.setHint("Moscow,RU");
-//        builder.setView(cityInput);
-//        builder.setPositiveButton("Submit", new DialogInterface.OnClickListener() {
-//            @Override
-//            public void onClick(DialogInterface dialog, int which) {
-//                CityPreference cityPreference = new CityPreference(MainActivity.this);
-//                cityPreference.setCity(cityInput.getText().toString());
-//
-//                String newCity = cityPreference.getCity();
-//
-//                renderWeatherData(newCity);
-//            }
-//        });
-//        builder.show();
-//
-//
-//    }
+        }
 
-//    @Override
-//    public boolean onCreateOptionMenu(Menu menu){
-//
-//
-//        getMenuInflater().inflate(R.menu.menu, menu);
-//        return true;
-//    }
 
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item){
-//        super.onOptionsItemSelected(item);
-//        return true;
+    private void showInputDialog(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder.setTitle("Change City");
 
-//        int id = item.getItemId();
-//
-//        if (id == R.id.change_cityId){
-//            showInputDialog();
-//        }
-//        return super.onOptionsItemSelected(item);
+        final EditText cityInput = new EditText(MainActivity.this);
+        cityInput.setInputType(InputType.TYPE_CLASS_TEXT);
+        cityInput.setHint("Moscow,RU");
+        builder.setView(cityInput);
+        builder.setPositiveButton("Submit", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                CityPreference cityPreference = new CityPreference(MainActivity.this);
+                cityPreference.setCity(cityInput.getText().toString());
+
+                String newCity = cityPreference.getCity();
+
+                renderWeatherData(newCity + "&appid=0254c107ac72d94ceb869f7857a97fa4");
+            }
+        });
+        builder.show();
+
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu, menu);
+       return true;
+    }
+
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item){
+
+
+
+        int id = item.getItemId();
+
+        if (id == R.id.change_cityId){
+            showInputDialog();
+        }
+        return super.onOptionsItemSelected(item);
     }
 
 
